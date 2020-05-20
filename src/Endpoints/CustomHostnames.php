@@ -30,26 +30,17 @@ class CustomHostnames implements API
      * @param string $hostname
      * @param string $sslMethod
      * @param string $sslType
-     * @param array $sslSettings
-     * @param string $customOriginServer
-     * @param bool $wildcard
      * @return \stdClass
      */
-    public function addHostname(string $zoneID, string $hostname, string $sslMethod = 'http', string $sslType = 'dv', array $sslSettings = [], string $customOriginServer = '', bool $wildcard = false): \stdClass
+    public function addHostname(string $zoneID, string $hostname, string $sslMethod = 'http', string $sslType = 'dv'): \stdClass
     {
         $options = [
             'hostname' => $hostname,
             'ssl' => [
                 'method' => $sslMethod,
-                'type' => $sslType,
-                'settings' => $sslSettings
-            ],
-            'wildcard' => $wildcard,
+                'type' => $sslType
+            ]
         ];
-
-        if (!empty($customOriginServer)) {
-            $options['custom_origin_server'] = $customOriginServer;
-        }
 
         $zone = $this->adapter->post('zones/'.$zoneID.'/custom_hostnames', $options);
         $this->body = json_decode($zone->getBody());
@@ -127,7 +118,7 @@ class CustomHostnames implements API
      * @param string $sslType
      * @return \stdClass
      */
-    public function updateHostname(string $zoneID, string $hostnameID, string $sslMethod = '', string $sslType = '', array $sslSettings = [], string $customOriginServer = ''): \stdClass
+    public function updateHostname(string $zoneID, string $hostnameID, string $sslMethod = '', string $sslType = ''): \stdClass
     {
         $query = [];
 
@@ -139,17 +130,9 @@ class CustomHostnames implements API
             $query['type'] = $sslType;
         }
 
-        if (!empty($sslSettings)) {
-            $query['settings'] = $sslSettings;
-        }
-
         $options = [
             'ssl' => $query
         ];
-
-        if (!empty($customOriginServer)) {
-            $options['custom_origin_server'] = $customOriginServer;
-        }
 
         $zone = $this->adapter->patch('zones/'.$zoneID.'/custom_hostnames/'.$hostnameID, $options);
         $this->body = json_decode($zone->getBody());
